@@ -1,5 +1,6 @@
 class Responder < ActiveRecord::Base
-  validates :type, :name, :capacity, :on_duty, presence: true
+  validates :type, :name, :capacity, presence: true
+  validates :on_duty, inclusion: { in: [true, false] }
   validates :capacity, inclusion: { in: [1..5], message: 'is not included in the list' }
 
   # This allows the "type" column to not conflict
@@ -13,6 +14,6 @@ class Responder < ActiveRecord::Base
   private
 
   def ensure_off_duty
-    self.on_duty ||= false
+    self.on_duty = false if on_duty.nil?
   end
 end
