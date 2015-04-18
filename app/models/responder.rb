@@ -8,7 +8,7 @@ class Responder < ActiveRecord::Base
   validates :type, :name, :capacity, presence: true
   validates :name, uniqueness: true
   validates :on_duty, inclusion: { in: [true, false] }
-  validates :capacity, inclusion: { in: (1..5).to_a, message: 'is not included in the list' }
+  validates :capacity, inclusion: { in: (1..5).to_a }
 
   after_initialize :ensure_off_duty
 
