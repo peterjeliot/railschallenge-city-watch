@@ -5,13 +5,10 @@ class RespondersController < ApplicationController
 
   def create
     @responder = Responder.new(responder_params)
-    if @responder.save
-      render json: @responder.json_format
-    else
-      # first_messages = .each { |k,v| v.replace [v[0]] }
-      # byebug
-      render json: { 'message' => @responder.errors.messages }, status: 422
-    end
+    @responder.save!
+    render json: @responder.json_format
+  rescue ActiveRecord::RecordInvalid
+    render json: { 'message' => @responder.errors.messages }, status: 422
   rescue ActionController::UnpermittedParameters => e
     render json: { 'message' => e.message }, status: 422
   end
