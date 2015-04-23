@@ -14,7 +14,7 @@ class Responder < ActiveRecord::Base
 
   def as_json(options = {})
     defaults = {
-      only: %w(emergency_code type name capacity on_duty),
+      except: [:id, :created_at, :updated_at],
       root: true
     }
     super options.merge(defaults)
