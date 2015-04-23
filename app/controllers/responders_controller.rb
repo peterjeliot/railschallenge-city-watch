@@ -6,7 +6,7 @@ class RespondersController < ApplicationController
   def create
     @responder = Responder.new(responder_params)
     @responder.save!
-    render json: @responder.json_format
+    render json: @responder.json_format, status: 201
   rescue ActiveRecord::RecordInvalid
     render json: { 'message' => @responder.errors.messages }, status: 422
   rescue ActionController::UnpermittedParameters => e
