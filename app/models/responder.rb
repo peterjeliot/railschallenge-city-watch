@@ -14,10 +14,9 @@ class Responder < ActiveRecord::Base
 
   def as_json(options = {})
     defaults = {
-      except: [:id, :created_at, :updated_at],
-      root: true
+      except: [:id, :created_at, :updated_at]
     }
-    super options.merge(defaults)
+    super defaults.merge(options)
   end
 
   private
