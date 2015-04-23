@@ -12,12 +12,12 @@ class Responder < ActiveRecord::Base
 
   after_initialize :ensure_on_duty_value
 
-  def json_format
-    filtered_column_names = %w(emergency_code type name capacity on_duty)
-    filtered_attributes = attributes.select do |attr, _|
-      filtered_column_names.include? attr
-    end
-    { responder: filtered_attributes }
+  def as_json(options = {})
+    defaults = {
+      only: %w(emergency_code type name capacity on_duty),
+      root: true
+    }
+    super options.merge(defaults)
   end
 
   private

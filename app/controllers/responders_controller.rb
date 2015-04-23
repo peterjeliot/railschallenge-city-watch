@@ -6,7 +6,7 @@ class RespondersController < ApplicationController
   def create
     @responder = Responder.new(responder_params)
     @responder.save!
-    render json: @responder.json_format, status: 201
+    render json: @responder, status: 201
   rescue ActiveRecord::RecordInvalid
     render json: { 'message' => @responder.errors.messages }, status: 422
   rescue ActionController::UnpermittedParameters => e
@@ -16,7 +16,7 @@ class RespondersController < ApplicationController
   def show
     @responder = Responder.find_by(name: params[:name])
     if @responder
-      render json: @responder.json_format
+      render json: @responder
     else
       render json: { 'error': 'Responder not found', name: params[:name] }, status: 404
     end
