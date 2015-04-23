@@ -14,8 +14,12 @@ class RespondersController < ApplicationController
   end
 
   def show
-    @responder = Responder.find(params[:id])
-    render json: @responder
+    @responder = Responder.find_by(name: params[:name])
+    if @responder
+      render json: @responder.json_format
+    else
+      render json: { 'error': 'Responder not found', name: params[:name] }, status: 404
+    end
   end
 
   private
