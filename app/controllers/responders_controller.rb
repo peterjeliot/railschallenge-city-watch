@@ -19,7 +19,7 @@ class RespondersController < ApplicationController
     if @responder
       render json: @responder, root: true
     else
-      render json: { error: 'Responder not found', name: params[:name] }, status: 404
+      routing_error
     end
   end
 
