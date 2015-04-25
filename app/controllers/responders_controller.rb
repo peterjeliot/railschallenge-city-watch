@@ -1,7 +1,11 @@
 class RespondersController < ApplicationController
   def index
-    responders = Responder.all.map(&:as_json)
-    render json: { responders: responders }
+    if params[:show] == 'capacity'
+      render json: all_capacities
+    else
+      responders = Responder.all.map(&:as_json)
+      render json: { responders: responders }
+    end
   end
 
   def create
@@ -41,5 +45,27 @@ class RespondersController < ApplicationController
 
   def responder_update_params
     params.require(:responder).permit(:on_duty)
+  end
+
+  def all_capacities
+    {
+      capacity: {
+        Fire: capacity_for_type('Fire'),
+        Police: capacity_for_type('Police'),
+        Medical: capacity_for_type('Medical')
+      }
+    }
+  end
+
+  def capacity_for_type(type)
+    restrictions = [
+      { type: type },
+      { type: type, emergency_code: nil },
+      { type: type, on_duty: true },
+      { type: type, emergency_code: nil, on_duty: true }
+    ]
+    restrictions.map do |restriction|
+      Responder.where(restriction).sum(:capacity)
+    end
   end
 end
