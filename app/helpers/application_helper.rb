@@ -15,7 +15,7 @@ module ApplicationHelper
   end
 
   def all_resources(emergency, type)
-    if Responder.where(type: type, on_duty: true).sum(:capacity) < emergency.severity(type)
+    if Responder.where(type: type, on_duty: true).sum(:capacity) < emergency.severities[type]
       emergency.full_response = false
       return Responder.where(type: type, on_duty: true)
     else
@@ -24,19 +24,19 @@ module ApplicationHelper
   end
 
   def exact_match(emergency, type, use_off_duty)
-    return [] if emergency.severity(type) == 0
+    return [] if emergency.severities[type] == 0
     if use_off_duty
-      Responder.where(type: type, capacity: emergency.severity(type)).first
+      Responder.where(type: type, capacity: emergency.severities[type]).first
     else
-      Responder.where(type: type, on_duty: true, capacity: emergency.severity(type)).first
+      Responder.where(type: type, on_duty: true, capacity: emergency.severities[type]).first
     end
   end
 
   def nearest_greater(emergency, type, use_off_duty)
     if use_off_duty
-      Responder.where(type: type).where('capacity > ?', emergency.severity(type)).first
+      Responder.where(type: type).where('capacity > ?', emergency.severities[type]).first
     else
-      Responder.where(type: type, on_duty: true).where('capacity > ?', emergency.severity(type)).first
+      Responder.where(type: type, on_duty: true).where('capacity > ?', emergency.severities[type]).first
     end
   end
 
@@ -45,13 +45,13 @@ module ApplicationHelper
     # and this should have a real algorithm to solve that
     # (or at least not use .combination)
     if use_off_duty
-      resps = Responder.where(type: type).where('capacity < ?', emergency.severity(type))
+      resps = Responder.where(type: type).where('capacity < ?', emergency.severities[type])
     else
-      resps = Responder.where(type: type, on_duty: true).where('capacity < ?', emergency.severity(type))
+      resps = Responder.where(type: type, on_duty: true).where('capacity < ?', emergency.severities[type])
     end
     2.upto(resps.length) do |count|
       resps.combination(count).each do |combo|
-        return combo if combo.map(&:capacity).sum >= emergency.severity(type)
+        return combo if combo.map(&:capacity).sum >= emergency.severities[type]
       end
     end
     nil
