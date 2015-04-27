@@ -1,4 +1,3 @@
-require 'byebug'
 class EmergenciesController < ApplicationController
   def index
     emergencies = Emergency.all.map { |e| e.as_json root: false }

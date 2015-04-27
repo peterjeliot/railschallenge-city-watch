@@ -37,7 +37,7 @@ module ApplicationHelper
     if severities[type] == 0
       return []
     end
-    if use_off_duty
+    unless use_off_duty
       Responder.where(type: type, on_duty: true, capacity: severities[type]).first
     else
       Responder.where(type: type, capacity: severities[type]).first
@@ -50,7 +50,7 @@ module ApplicationHelper
       'Police' => emergency.police_severity,
       'Medical' => emergency.medical_severity
     }
-    if use_off_duty
+    unless use_off_duty
       Responder.where(type: type, on_duty: true).where('capacity > ?', severities[type]).first
     else
       Responder.where(type: type).where('capacity > ?', severities[type]).first
