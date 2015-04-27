@@ -27,4 +27,13 @@ class Emergency < ActiveRecord::Base
     end
     result
   end
+
+  def severity(type)
+    severities = {
+      'Fire' => self.fire_severity,
+      'Police' => self.police_severity,
+      'Medical' => self.medical_severity
+    }
+    severities[type]
+  end
 end

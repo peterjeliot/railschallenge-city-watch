@@ -15,12 +15,7 @@ module ApplicationHelper
   end
 
   def all_resources(emergency, type)
-    severities = {
-      'Fire' => emergency.fire_severity,
-      'Police' => emergency.police_severity,
-      'Medical' => emergency.medical_severity
-    }
-    if Responder.where(type: type, on_duty: true).sum(:capacity) < severities[type]
+    if Responder.where(type: type, on_duty: true).sum(:capacity) < emergency.severity(type)
       emergency.full_response = false
       return Responder.where(type: type, on_duty: true)
     else
@@ -29,29 +24,19 @@ module ApplicationHelper
   end
 
   def exact_match(emergency, type, use_off_duty)
-    severities = {
-      'Fire' => emergency.fire_severity,
-      'Police' => emergency.police_severity,
-      'Medical' => emergency.medical_severity
-    }
-    return [] if severities[type] == 0
+    return [] if emergency.severity(type) == 0
     if use_off_duty
-      Responder.where(type: type, capacity: severities[type]).first
+      Responder.where(type: type, capacity: emergency.severity(type)).first
     else
-      Responder.where(type: type, on_duty: true, capacity: severities[type]).first
+      Responder.where(type: type, on_duty: true, capacity: emergency.severity(type)).first
     end
   end
 
   def nearest_greater(emergency, type, use_off_duty)
-    severities = {
-      'Fire' => emergency.fire_severity,
-      'Police' => emergency.police_severity,
-      'Medical' => emergency.medical_severity
-    }
     if use_off_duty
-      Responder.where(type: type).where('capacity > ?', severities[type]).first
+      Responder.where(type: type).where('capacity > ?', emergency.severity(type)).first
     else
-      Responder.where(type: type, on_duty: true).where('capacity > ?', severities[type]).first
+      Responder.where(type: type, on_duty: true).where('capacity > ?', emergency.severity(type)).first
     end
   end
 
@@ -59,19 +44,14 @@ module ApplicationHelper
     # yes, this is very inefficient. This problem is like the knapsack problem,
     # and this should have a real algorithm to solve that
     # (or at least not use .combination)
-    severities = {
-      'Fire' => emergency.fire_severity,
-      'Police' => emergency.police_severity,
-      'Medical' => emergency.medical_severity
-    }
     if use_off_duty
-      resps = Responder.where(type: type).where('capacity < ?', severities[type])
+      resps = Responder.where(type: type).where('capacity < ?', emergency.severity(type))
     else
-      resps = Responder.where(type: type, on_duty: true).where('capacity < ?', severities[type])
+      resps = Responder.where(type: type, on_duty: true).where('capacity < ?', emergency.severity(type))
     end
     2.upto(resps.length) do |count|
       resps.combination(count).each do |combo|
-        return combo if combo.map(&:capacity).sum >= severities[type]
+        return combo if combo.map(&:capacity).sum >= emergency.severity(type)
       end
     end
     nil
