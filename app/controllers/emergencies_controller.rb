@@ -1,7 +1,7 @@
 require 'byebug'
 class EmergenciesController < ApplicationController
   def index
-    emergencies = Emergency.all.map { |e| e.as_json(methods: :full_response) }
+    emergencies = Emergency.all.map { |e| e.as_json root: false }
     render json: { emergencies: emergencies }
   end
 
@@ -9,7 +9,7 @@ class EmergenciesController < ApplicationController
     @emergency = Emergency.new(emergency_create_params)
     @emergency.save!
     dispatch_responders(@emergency)
-    render json: @emergency.to_json, status: 201
+    render json: @emergency, root: true, status: 201
   rescue ActiveRecord::RecordInvalid
     render json: { 'message' => @emergency.errors.messages }, status: 422
   rescue ActionController::UnpermittedParameters => e
@@ -19,7 +19,7 @@ class EmergenciesController < ApplicationController
   def show
     @emergency = Emergency.find_by(code: params[:code])
     if @emergency
-      render json: @emergency
+      render json: @emergency, root: true
     else
       routing_error
     end
@@ -28,7 +28,7 @@ class EmergenciesController < ApplicationController
   def update
     @emergency = Emergency.find_by(code: params[:code])
     @emergency.update!(emergency_update_params)
-    render json: @emergency, status: 200
+    render json: @emergency, root: true, status: 200
   rescue ActiveRecord::RecordInvalid
     render json: { 'message' => @emergency.errors.messages }, status: 422
   rescue ActionController::UnpermittedParameters => e
