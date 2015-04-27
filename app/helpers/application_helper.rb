@@ -34,13 +34,11 @@ module ApplicationHelper
       'Police' => emergency.police_severity,
       'Medical' => emergency.medical_severity
     }
-    if severities[type] == 0
-      return []
-    end
-    unless use_off_duty
-      Responder.where(type: type, on_duty: true, capacity: severities[type]).first
-    else
+    return [] if severities[type] == 0
+    if use_off_duty
       Responder.where(type: type, capacity: severities[type]).first
+    else
+      Responder.where(type: type, on_duty: true, capacity: severities[type]).first
     end
   end
 
@@ -50,10 +48,10 @@ module ApplicationHelper
       'Police' => emergency.police_severity,
       'Medical' => emergency.medical_severity
     }
-    unless use_off_duty
-      Responder.where(type: type, on_duty: true).where('capacity > ?', severities[type]).first
-    else
+    if use_off_duty
       Responder.where(type: type).where('capacity > ?', severities[type]).first
+    else
+      Responder.where(type: type, on_duty: true).where('capacity > ?', severities[type]).first
     end
   end
 
@@ -73,9 +71,7 @@ module ApplicationHelper
     end
     2.upto(resps.length) do |count|
       resps.combination(count).each do |combo|
-        if combo.map(&:capacity).sum >= severities[type]
-          return combo
-        end
+        return combo if combo.map(&:capacity).sum >= severities[type]
       end
     end
     nil
