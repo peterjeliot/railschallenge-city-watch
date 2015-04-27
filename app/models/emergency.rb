@@ -8,6 +8,11 @@ class Emergency < ActiveRecord::Base
 
   attr_accessor :full_response
 
+  def resolved_at=(time)
+    self.responders = [] if time
+    super
+  end
+
   def as_json(options = {})
     defaults = {
       except: [:id, :created_at, :updated_at],
