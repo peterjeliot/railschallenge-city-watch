@@ -30,9 +30,9 @@ class Emergency < ActiveRecord::Base
 
   def severities
     {
-      'Fire' => self.fire_severity,
-      'Police' => self.police_severity,
-      'Medical' => self.medical_severity
+      'Fire' => fire_severity,
+      'Police' => police_severity,
+      'Medical' => medical_severity
     }
   end
 end
