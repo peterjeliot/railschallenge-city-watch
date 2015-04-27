@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150425010121) do
+ActiveRecord::Schema.define(version: 20150427035336) do
 
   create_table "emergencies", force: :cascade do |t|
     t.string   "code",             null: false
@@ -21,6 +21,7 @@ ActiveRecord::Schema.define(version: 20150425010121) do
     t.datetime "resolved_at"
     t.datetime "created_at",       null: false
     t.datetime "updated_at",       null: false
+    t.boolean  "full_response"
   end
 
   add_index "emergencies", ["fire_severity"], name: "index_emergencies_on_fire_severity"

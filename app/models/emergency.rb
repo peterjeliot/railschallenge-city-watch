@@ -6,10 +6,13 @@ class Emergency < ActiveRecord::Base
 
   has_many :responders, primary_key: :code, foreign_key: :emergency_code
 
-  attr_accessor :full_response
-
   def resolved_at=(time)
-    self.responders = [] if time
+    if time
+      self.responders = []
+      responders.each do |resp|
+        resp.emergency_code = nil # I thought the association took care of this...
+      end
+    end
     super
   end
 

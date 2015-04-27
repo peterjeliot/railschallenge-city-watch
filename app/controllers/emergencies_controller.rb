@@ -1,7 +1,7 @@
 require 'byebug'
 class EmergenciesController < ApplicationController
   def index
-    emergencies = Emergency.all.map(&:as_json)
+    emergencies = Emergency.all.map { |e| e.as_json(methods: :full_response) }
     render json: { emergencies: emergencies }
   end
 

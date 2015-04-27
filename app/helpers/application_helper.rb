@@ -32,7 +32,10 @@ module ApplicationHelper
       'Police' => emergency.police_severity,
       'Medical' => emergency.medical_severity
     }
-    return [] if severities[type] == 0
+    if severities[type] == 0
+      emergency.full_response = true
+      return []
+    end
     if use_off_duty
       emergency.full_response = true
       Responder.where(type: type, on_duty: true, capacity: severities[type]).first
