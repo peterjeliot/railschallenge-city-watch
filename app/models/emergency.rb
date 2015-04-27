@@ -4,16 +4,10 @@ class Emergency < ActiveRecord::Base
   validates :fire_severity, :police_severity, :medical_severity,
             numericality: { greater_than_or_equal_to: 0 }
 
-  has_many :responders, primary_key: :code, foreign_key: :emergency_code
+  has_many :responders, primary_key: :code, foreign_key: :emergency_code, inverse_of: :emergency
 
   def resolved_at=(time)
-    if time
-      self.responders = []
-      responders.each do |resp|
-        resp.emergency_code = nil # I thought the association took care of this...
-        resp.save!
-      end
-    end
+    self.responders = [] if time
     super
   end
 

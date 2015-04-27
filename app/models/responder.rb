@@ -10,7 +10,7 @@ class Responder < ActiveRecord::Base
   validates :on_duty, inclusion: { in: [true, false] }
   validates :capacity, inclusion: { in: (1..5).to_a }
 
-  belongs_to :emergency, primary_key: :code, foreign_key: :emergency_code
+  belongs_to :emergency, primary_key: :code, foreign_key: :emergency_code, inverse_of: :responders
 
   after_initialize :ensure_on_duty_value
 
