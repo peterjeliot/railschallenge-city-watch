@@ -2,6 +2,7 @@ module ApplicationHelper
   def dispatch_responders(e) # emergency
     e.full_response = true # default value
     responders = %w(Fire Police Medical).flat_map do |type|
+      # this monster OR statement does the checks in order
       all_resources(e, type) ||
       exact_match(e, type, false) || nearest_greater(e, type, false) || sum_of_lessers(e, type, false) ||
       exact_match(e, type, true) || nearest_greater(e, type, true) || sum_of_lessers(e, type, true)
