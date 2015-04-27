@@ -2,7 +2,11 @@ require 'byebug'
 class EmergenciesController < ApplicationController
   def index
     emergencies = Emergency.all.map { |e| e.as_json root: false }
-    render json: { emergencies: emergencies }
+    full_responses = [
+      Emergency.where(full_response: true).count,
+      Emergency.count
+    ]
+    render json: { emergencies: emergencies, full_responses: full_responses }
   end
 
   def create

@@ -1,5 +1,6 @@
 module ApplicationHelper
   def dispatch_responders(e) # emergency
+    e.full_response = true
     responders = %w(Fire Police Medical).flat_map do |type|
       all_resources(e, type) ||
       exact_match(e, type, false) || nearest_greater(e, type, false) || sum_of_lessers(e, type, false) ||
@@ -10,6 +11,7 @@ module ApplicationHelper
       resp.emergency_code = e.code
       resp.save!
     end
+    e.save!
   end
 
   def all_resources(emergency, type)
@@ -33,11 +35,9 @@ module ApplicationHelper
       'Medical' => emergency.medical_severity
     }
     if severities[type] == 0
-      emergency.full_response = true
       return []
     end
     if use_off_duty
-      emergency.full_response = true
       Responder.where(type: type, on_duty: true, capacity: severities[type]).first
     else
       Responder.where(type: type, capacity: severities[type]).first
@@ -51,7 +51,6 @@ module ApplicationHelper
       'Medical' => emergency.medical_severity
     }
     if use_off_duty
-      emergency.full_response = true
       Responder.where(type: type, on_duty: true).where('capacity > ?', severities[type]).first
     else
       Responder.where(type: type).where('capacity > ?', severities[type]).first
@@ -59,6 +58,9 @@ module ApplicationHelper
   end
 
   def sum_of_lessers(emergency, type, use_off_duty)
+    # yes, this is very inefficient. This problem is like the knapsack problem,
+    # and this should have a real algorithm to solve that
+    # (or at least not use .combination)
     severities = {
       'Fire' => emergency.fire_severity,
       'Police' => emergency.police_severity,
@@ -71,16 +73,11 @@ module ApplicationHelper
     end
     2.upto(resps.length) do |count|
       resps.combination(count).each do |combo|
-        if combo.map(&:capacity).sum == severities[type]
-          emergency.full_response = true
+        if combo.map(&:capacity).sum >= severities[type]
           return combo
         end
       end
     end
     nil
-  end
-
-  def capacities_list(type)
-    Responder.where(type: type, on_duty: true).order(capacity: :asc).map(&:capacity)
   end
 end
