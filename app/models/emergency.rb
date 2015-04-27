@@ -20,10 +20,10 @@ class Emergency < ActiveRecord::Base
     if new_options[:root]
       # what's the right way to do this? include/method puts a hash of {name: foo}s, not an array of foos
       result['emergency']['responders'] = responders.map(&:name)
-      result['emergency']['full_response'] = full_response # TODO
+      result['emergency']['full_response'] = full_response
     else
       result['responders'] = responders.map(&:name)
-      result['full_response'] = full_response # TODO
+      result['full_response'] = full_response
     end
     result
   end
